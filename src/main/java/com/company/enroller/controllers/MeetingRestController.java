@@ -14,6 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/meetings")
+@CrossOrigin(origins = "*") // DODANO: Pozwala na komunikację z frontendem
 public class MeetingRestController {
 
     @Autowired

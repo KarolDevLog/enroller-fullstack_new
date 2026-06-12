@@ -1,6 +1,6 @@
 package com.company.enroller.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties; // DODANO
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -33,6 +33,7 @@ public class Meeting {
     @Column
     private String date;
 
+    @JsonIgnoreProperties("meetings") // DODANO: Zapobiega zapętleniu JSON
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "meeting_participant", joinColumns = {@JoinColumn(name = "meeting_id")}, inverseJoinColumns = {
             @JoinColumn(name = "participant_login")})
@@ -80,5 +81,10 @@ public class Meeting {
 
     public Collection<Participant> getParticipants() {
         return participants;
+    }
+
+    // DODANO: Potrzebne do odczytywania żądań POST z frontendu
+    public void setParticipants(Set<Participant> participants) {
+        this.participants = participants;
     }
 }
