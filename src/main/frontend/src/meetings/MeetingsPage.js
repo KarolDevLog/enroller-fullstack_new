@@ -1,12 +1,24 @@
-import {useState} from "react";
+import { useState, useEffect } from "react"; // POPRAWKA: Dodano useEffect do importu
 import NewMeetingForm from "./NewMeetingForm";
 import MeetingsList from "./MeetingsList";
 
-export default function MeetingsPage({username}) {
+export default function MeetingsPage({ username }) {
     const [meetings, setMeetings] = useState([]);
     const [addingNewMeeting, setAddingNewMeeting] = useState(false);
 
-    // ZMIANA: Funkcja asynchroniczna wysyłająca spotkanie do bazy danych backendu
+    // DODANO: Pobieranie istniejących spotkań z backendu przy wejściu do aplikacji
+    useEffect(() => {
+        const fetchMeetings = async () => {
+            const response = await fetch('/api/meetings');
+            if (response.ok) {
+                const meetings = await response.json();
+                setMeetings(meetings);
+            }
+        };
+        fetchMeetings();
+    }, []); // Pusta tablica oznacza, że pobierze dane tylko raz, przy starcie
+
+    // Funkcja asynchroniczna dodawania (z poprzedniego zadania)
     async function handleNewMeeting(meeting) {
         const response = await fetch('/api/meetings', {
             method: 'POST',
@@ -15,7 +27,7 @@ export default function MeetingsPage({username}) {
         });
 
         if (response.ok) {
-            const savedMeeting = await response.json(); // Pobieramy obiekt z nadanym przez serwer ID
+            const savedMeeting = await response.json();
             const nextMeetings = [...meetings, savedMeeting];
             setMeetings(nextMeetings);
             setAddingNewMeeting(false);
@@ -24,7 +36,6 @@ export default function MeetingsPage({username}) {
         }
     }
 
-    // Pozostaje bez zmian
     function handleDeleteMeeting(meeting) {
         const nextMeetings = meetings.filter(m => m !== meeting);
         setMeetings(nextMeetings);
